@@ -1,20 +1,105 @@
-<!DOCTYPE html>
-<html lang="ja">
+<!doctype html>
+<html>
 <head>
-  <title>360 Panorama Viewer Demo : Three.js : Movie</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
+  <title>360 Panorama Viewer : Three.js : Image</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="stylesheet" href="../common/css/style.css">
-  <!-- three.jsの読み込み -->
-  <script src="../common/js/three.min.js"></script>
-  <!-- DeviceOrientationControls.jsの読み込み -->
-  <script src="../common/js/DeviceOrientationControls.js"></script>
-  <!-- OrbitControls.jsの読み込み -->
-  <script src="../common/js/OrbitControls.js"></script>
-  <!-- main.jsの読み込み -->
-  <script src="js/main.js" ></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.167.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.167.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+
+    const scene = new THREE.Scene();
+
+    // カメラの作成
+    const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 1, 1000);
+    camera.position.set(0, 0, 0);
+    scene.add(camera);
+
+    // 球体の形状を作成
+    const geometry = new THREE.SphereGeometry(5, 60, 40);
+    geometry.scale(-1, 1, 1);
+
+    // 動画の読み込み
+    const video = document.createElement("video");
+    video.src = "../common/videos/video.mp4";
+    video.autoplay = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.muted = true;
+    video.play();
+
+
+    //テクスチャーにvideoを設定
+    const texture = new THREE.VideoTexture(video);
+    texture.colorSpace = THREE.SRGBColorSpace;
+
+    //マテリアルの作成
+    const material = new THREE.MeshBasicMaterial({
+      // 画像をテクスチャとして読み込み
+      map: texture,
+    });
+
+    // 球体(形状)にマテリアル(質感)を貼り付けて物体を作成
+    const sphere = new THREE.Mesh(geometry, material);
+
+    //　シーンに追加
+    scene.add(sphere);
+
+    // レンダラーの作成
+    const renderer = new THREE.WebGLRenderer();
+
+    renderer.setClearColor({color: 0x000000});
+    const element = renderer.domElement;
+    document.body.append(element);
+    renderer.render(scene, camera);
+
+
+    // パソコン閲覧時マウスドラッグで視点操作する
+    const controls = new OrbitControls(camera, element);
+    controls.target.set(
+            camera.position.x + 0.15,
+            camera.position.y,
+            camera.position.z
+    );
+    // 視点操作のイージングをONにする
+    controls.enableDamping = true;
+    // 視点操作のイージングの値
+    controls.dampingFactor = 0.1;
+    // 視点変更の速さ
+    controls.rotateSpeed = 0.5;
+    // ズーム禁止
+    controls.noZoom = false;
+    // パン操作禁止
+    controls.noPan = false;
+
+    // リサイズイベントを検知してリサイズ処理を実行
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    tick();
+
+    // リサイズ処理
+    function handleResize() {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    }
+
+    function tick() {
+      requestAnimationFrame(tick);
+      renderer.render(scene, camera);
+      controls.update();
+    }
+  </script>
 </head>
 <body>
-  <div id="stage"></div>
 </body>
 </html>
