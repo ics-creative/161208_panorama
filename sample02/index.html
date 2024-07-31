@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <title>360 Panorama Viewer Demo : A-Frame : Movie</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
+  <!-- A-frameの読み込み -->
+  <script src="../common/js/aframe-v0.4.0.min.js"></script>
+</head>
+<body>
+<!-- シーン -->
+<a-scene>
+  <!-- 素材 -->
+  <a-assets>
+    <video id="video"
+           src="../common/videos/video.mp4"
+           loop="true"></video>
+  </a-assets>
+  <!-- 全天球背景 -->
+  <a-videosphere src="#video" rotation="0 -130 0"></a-videosphere>
+</a-scene>
+</body>
+</html>
